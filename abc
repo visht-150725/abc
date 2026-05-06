@@ -1,0 +1,188 @@
+# ===============================
+# DSBDA ALL PRACTICALS (ONE FILE)
+# ===============================
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# =====================================
+# CHEAT 2 / 3 / 8 / 10 (Facebook / Adult)
+# =====================================
+
+df = pd.read_csv("adult.csv")
+
+# Subset
+subset = df[['age', 'education', 'income']]
+
+# Merge
+df2 = df[['age', 'income']]
+merged = pd.merge(df, df2, on='age')
+
+# Sort
+sorted_df = df.sort_values(by='age', ascending=False)
+
+# Transpose
+transposed = df.T
+
+# Shape
+print("Shape:", df.shape)
+
+# Reshape (Pivot)
+pivot = df.pivot_table(values='age', index='education', aggfunc='mean')
+
+
+# =====================================
+# CHEAT 4 (Air Quality - Data Processing + Model)
+# =====================================
+
+air = pd.read_csv("air_quality.csv")
+
+# Cleaning
+air = air.drop_duplicates()
+air = air.dropna()
+
+# Transformation
+air['City'] = air['City'].astype('category').cat.codes
+
+# Error correction
+air = air[air['AQI'] > 0]
+
+# Model
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+X = air[['PM2.5', 'PM10', 'NO2']]
+y = air['AQI']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+
+# =====================================
+# CHEAT 5 (Heart Disease - Model)
+# =====================================
+
+heart = pd.read_csv("heart.csv")
+
+heart = heart.dropna()
+
+X = heart[['age', 'chol', 'trestbps']]
+y = heart['target']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+# =====================================
+# CHEAT 6 (Forest Fire Visualization)
+# =====================================
+
+forest = pd.read_csv("forestfires.csv")
+
+# Line
+forest.groupby('month')['area'].sum().plot(kind='line')
+plt.title("Monthly Area")
+plt.show()
+
+# Bar
+forest['month'].value_counts().plot(kind='bar')
+plt.title("Fire Count")
+plt.show()
+
+# Histogram
+plt.hist(forest['area'])
+plt.show()
+
+# Scatter
+plt.scatter(forest['wind'], forest['area'])
+plt.show()
+
+# Box
+sns.boxplot(x=forest['temp'])
+plt.show()
+
+# Heatmap
+corr = forest[['temp','RH','wind','rain']].corr()
+sns.heatmap(corr, annot=True)
+plt.show()
+
+
+# =====================================
+# CHEAT 5 / 10 (Heart Visualization)
+# =====================================
+
+# Countplot
+sns.countplot(x=heart['target'])
+plt.show()
+
+# Bar chart
+sns.barplot(x=heart['sex'], y=heart['target'])
+plt.show()
+
+# Histogram
+plt.hist(heart['age'])
+plt.show()
+
+# Scatter
+plt.scatter(heart['age'], heart['thalach'])
+plt.show()
+
+# Box
+sns.boxplot(x=heart['target'], y=heart['chol'])
+plt.show()
+
+# Heatmap
+sns.heatmap(heart.corr(), annot=True)
+plt.show()
+
+
+# =====================================
+# CHEAT 4 (Air Quality Visualization)
+# =====================================
+
+# Line
+air.groupby('date')['AQI'].mean().plot(kind='line')
+plt.show()
+
+# Histogram
+plt.hist(air['AQI'])
+plt.show()
+
+# Scatter
+plt.scatter(air['temp'], air['AQI'])
+plt.show()
+
+# Box
+sns.boxplot(x=air['City'], y=air['AQI'])
+plt.show()
+
+# Heatmap
+sns.heatmap(air.corr(), annot=True)
+plt.show()
+
+
+# =====================================
+# CHEAT 3 / 6 / 9 (Web Scraping)
+# =====================================
+
+import requests
+from bs4 import BeautifulSoup
+
+url = "http://books.toscrape.com/"
+response = requests.get(url)
+
+soup = BeautifulSoup(response.text, 'html.parser')
+
+books = soup.find_all('article')
+
+for book in books:
+    title = book.h3.a['title']
+    price = book.find('p', class_='price_color').text
+    print(title, price)
